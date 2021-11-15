@@ -1,59 +1,82 @@
 <script setup lang="ts">
-import { useUserStore } from '~/stores/user'
+import { useQuery, useResult } from '@vue/apollo-composable'
+import { gql } from 'graphql-tag'
+import { PokemonResults, Pokemons } from '~/libs/models/pokemon'
 
-const user = useUserStore()
-const name = ref(user.savedName)
+const limit = 15
+const currentPage = ref(1)
+const enabledFetch = ref(false)
+
+const { result, variables, fetchMore, refetch } = useQuery<PokemonResults>(gql`
+  query pokemons($offset: Int, $limit: Int) {
+    pokemons(limit: $limit, offset: $offset) {
+      count
+      next
+      previous
+      status
+      message
+      results {
+        url
+        name
+        image,
+        artwork,
+        dreamworld
+      }
+    }
+  }
+`,
+{
+  limit,
+  offset: 0,
+}, () => ({ enabled: enabledFetch.value }))
+
+const count = computed(() => useResult(result, { results: [] } as Pokemons).value.count || 0)
+const pokemons = computed(() => useResult(result, { results: [] } as Pokemons).value.results)
 
 const router = useRouter()
-const go = () => {
-  if (name.value)
-    router.push(`/hi/${encodeURIComponent(name.value)}`)
+const route = useRoute()
+
+const fetchPokemons = () => {
+  enabledFetch.value = true
+  refetch()
 }
 
-const { t } = useI18n()
+const init = () => {
+  const page = route.query.page
+  if (typeof page === 'string')
+    currentPage.value = +page || 1
+
+  variables.value = {
+    limit,
+    offset: (currentPage.value - 1) * limit,
+  }
+
+  fetchPokemons()
+}
+
+watch([currentPage], ([curPage]) => {
+  router.push({ name: 'index', query: { page: curPage } })
+  fetchMore({
+    variables: {
+      offset: (curPage - 1) * limit,
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult) return previousResult
+
+      return fetchMoreResult
+    },
+
+  })
+})
+
+init()
 </script>
 
 <template>
   <div>
-    <p class="text-4xl">
-      <carbon-campsite class="inline-block" />
-    </p>
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse" target="_blank">
-        Vitesse
-      </a>
-    </p>
-    <p>
-      <em class="text-sm opacity-75">{{ t('intro.desc') }}</em>
-    </p>
-
-    <div class="py-4" />
-
-    <input
-      id="input"
-      v-model="name"
-      :placeholder="t('intro.whats-your-name')"
-      :aria-label="t('intro.whats-your-name')"
-      type="text"
-      autocomplete="false"
-      p="x-4 y-2"
-      w="250px"
-      text="center"
-      bg="transparent"
-      border="~ rounded gray-200 dark:gray-700"
-      outline="none active:none"
-      @keydown.enter="go"
-    >
-    <label class="hidden" for="input">{{ t('intro.whats-your-name') }}</label>
-
-    <div>
-      <button
-        class="m-3 text-sm btn"
-        :disabled="!name"
-        @click="go"
-      >
-        {{ t('button.go') }}
-      </button>
+    <PokemonList :pokemons="pokemons" />
+    <div class="my-4 flex justify-center">
+      <Pagination v-model:current-page="currentPage" :total-data="count" :page-size="limit" />
     </div>
   </div>
 </template>

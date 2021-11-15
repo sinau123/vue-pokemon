@@ -4,6 +4,8 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    BxBxsChevronLeft: typeof import('~icons/bx/bxs-chevron-left')['default']
+    BxBxsChevronRight: typeof import('~icons/bx/bxs-chevron-right')['default']
     CarbonCampsite: typeof import('~icons/carbon/campsite')['default']
     CarbonDicomOverlay: typeof import('~icons/carbon/dicom-overlay')['default']
     CarbonLanguage: typeof import('~icons/carbon/language')['default']
@@ -13,6 +15,10 @@ declare module 'vue' {
     CarbonSun: typeof import('~icons/carbon/sun')['default']
     CarbonWarning: typeof import('~icons/carbon/warning')['default']
     Footer: typeof import('./components/Footer.vue')['default']
+    Pagination: typeof import('./components/Pagination.vue')['default']
+    PokemonDetailModal: typeof import('./components/PokemonDetailModal.vue')['default']
+    PokemonList: typeof import('./components/pokemon/PokemonList.vue')['default']
+    PokemonListItem: typeof import('./components/pokemon/PokemonListItem.vue')['default']
     README: typeof import('./components/README.md')['default']
   }
 }
