@@ -1,9 +1,8 @@
+import { App } from '@vue/runtime-core'
 import NProgress from 'nprogress'
-import { UserModule } from '~/types'
+import router from '~/router'
 
-export const install: UserModule = ({ isClient, router }) => {
-  if (isClient) {
-    router.beforeEach(() => { NProgress.start() })
-    router.afterEach(() => { NProgress.done() })
-  }
+export const install = (app: App) => {
+  router.beforeEach(() => { NProgress.start() })
+  router.afterEach(() => { NProgress.done() })
 }
