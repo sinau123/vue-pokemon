@@ -8,6 +8,9 @@ context('Basic', () => {
     cy.url()
       .should('eq', 'http://localhost:3333/')
 
+    cy.get('.pokemon-item').should('have.length', 15)
+    cy.get('.pokemon-item').first().find('img').should('exist')
+
     // cy.contains('[Home Layout]')
     //   .should('exist')
 

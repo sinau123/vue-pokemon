@@ -48,34 +48,55 @@ const nextPage = () => {
 </script>
 
 <template>
-  <div v-if="items.length > 0" class="flex space-x-1">
-    <button
-      class="btn justify-center min-w-9 h-9"
-      :class="{ 'btn-disabled': currentPage === 1 }"
-      @click="prevPage"
-    >
-      <div class="flex">
-        <bx-bxs-chevron-left />
+  <template v-if="items.length > 0">
+    <div class="flex items-center justify-center text-xs sm:text-base space-x-1">
+      <button
+        class="btn flex items-center justify-center min-w-12 h-9"
+        :class="{ 'btn-disabled': currentPage === 1 }"
+        @click="prevPage"
+      >
+        <div class="text-xl">
+          <bx-bxs-chevron-left />
+        </div>
+      </button>
+      <div class="<sm:hidden flex space-x-1 flex-wrap justify-center">
+        <button
+          v-for="(page, idx) in items"
+          :key="idx"
+          class="btn justify-center min-w-9 h-9 <sm:my-1"
+          :disabled="page === '...' || page === currentPage"
+          @click="goToPage(page)"
+        >
+          {{ page }}
+        </button>
       </div>
-    </button>
-    <button
-      v-for="(page, idx) in items"
-      :key="idx"
-      class="btn justify-center min-w-9 h-9"
-      :disabled="page === '...' || page === currentPage"
-      @click="goToPage(page)"
-    >
-      {{ page }}
-    </button>
-    <button
-      class="btn justify-center min-w-9 h-9"
-      :class="{ 'btn-disabled': currentPage === totalPage }"
-      @click="nextPage"
-    >
-      <div class="flex">
-        <bx-bxs-chevron-right />
-      </div>
-    </button>
-  </div>
+      <button
+        class="btn flex items-center justify-center min-w-12 h-9"
+        :class="{ 'btn-disabled': currentPage === totalPage }"
+        @click="nextPage"
+      >
+        <div class="text-xl">
+          <bx-bxs-chevron-right />
+        </div>
+      </button>
+    </div>
+    <div class="sm:hidden flex space-x-1 my-1 flex-wrap justify-center">
+      <button
+        v-for="(page, idx) in items"
+        :key="idx"
+        class="btn justify-center min-w-9 h-9 <sm:my-1"
+        :class="{ hidden: page === '...', 'mr-4': idx === 0, '!ml-4': idx === items.length - 1 }"
+        :disabled="page === '...' || page === currentPage"
+        @click="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </div>
+  </template>
   <div v-else></div>
 </template>
+<style scoped>
+.btn {
+  @apply <sm:p-1;
+}
+</style>
